@@ -5,6 +5,34 @@ import (
 	"math/big"
 )
 
+const (
+	less = -1
+	eq   = 0
+	gtr  = 1
+)
+
+func b_(fn func(Value, Value) bool) func(Value, Value) Value {
+	return func(l Value, r Value) (ret Value) {
+		ret = Value{T: BOOLEAN}
+		ret.V = fn(l, r)
+		return
+	}
+}
+
+func b_i_(fn func(*big.Int, Value) bool) func(Value, Value) bool {
+	return func(l Value, r Value) bool {
+		li := l.ToInt()
+		return fn(li, r)
+	}
+}
+
+func b_i_i_(fn func(*big.Int, *big.Int) bool) func(*big.Int, Value) bool {
+	return func(li *big.Int, r Value) bool {
+		ri := r.ToInt()
+		return fn(li, ri)
+	}
+}
+
 func i_(fn func(Value, Value) *big.Int) func(Value, Value) Value {
 	return func(l Value, r Value) (ret Value) {
 		ret = Value{T: INTEGER}

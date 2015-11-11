@@ -10,6 +10,16 @@ type Cmp struct {
 	Re, Im *big.Rat
 }
 
+func (v Value) ToBool() (ret bool) {
+	switch v.T {
+	case BOOLEAN:
+		ret = v.V.(bool)
+	default:
+		halt.As(100, v.T)
+	}
+	return
+}
+
 func (v Value) ToInt() (ret *big.Int) {
 	switch v.T {
 	case INTEGER:
