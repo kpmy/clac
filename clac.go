@@ -5,7 +5,6 @@ import (
 	"github.com/kpmy/ypk/assert"
 	"github.com/kpmy/ypk/halt"
 	"log"
-	"math/big"
 	"strconv"
 )
 
@@ -134,276 +133,6 @@ func put(op Op, l Type, r Type, fn dfn) {
 	}
 }
 
-func init_INTEGER() {
-	put(NEG, INTEGER, NoType, i_(i_i_(func(li *big.Int, r Value) *big.Int {
-		return li.Neg(li)
-	})))
-
-	put(SUM, INTEGER, INTEGER, i_(i_i_(i_i_i_(func(li *big.Int, ri *big.Int) *big.Int {
-		return li.Add(li, ri)
-	}))))
-
-	put(DIFF, INTEGER, INTEGER, i_(i_i_(i_i_i_(func(li *big.Int, ri *big.Int) *big.Int {
-		return li.Sub(li, ri)
-	}))))
-
-	put(MULT, INTEGER, INTEGER, i_(i_i_(i_i_i_(func(li *big.Int, ri *big.Int) *big.Int {
-		return li.Mul(li, ri)
-	}))))
-
-	put(EQ, INTEGER, INTEGER, b_(b_i_(b_i_i_(func(li *big.Int, ri *big.Int) bool {
-		res := li.Cmp(ri)
-		return res == eq
-	}))))
-}
-
-func init_RATIONAL() {
-	put(NEG, RATIONAL, NoType, r_(r_r_(func(lr *big.Rat, r Value) *big.Rat {
-		return lr.Neg(lr)
-	})))
-
-	put(SUM, RATIONAL, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Add(lr, rr)
-	}))))
-
-	put(DIFF, RATIONAL, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Sub(lr, rr)
-	}))))
-
-	put(MULT, RATIONAL, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Mul(lr, rr)
-	}))))
-
-	put(QUOT, RATIONAL, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Quo(lr, rr)
-	}))))
-}
-
-func init_COMPLEX() {
-	put(NEG, COMPLEX, NoType, c_(c_c_(func(lc *Cmp, r Value) *Cmp {
-		ret := new(Cmp)
-		ret.Im = lc.Im.Neg(lc.Im)
-		ret.Re = lc.Re.Neg(lc.Re)
-		return ret
-	})))
-
-	put(CON, COMPLEX, NoType, c_(c_c_(func(lc *Cmp, r Value) *Cmp {
-		ret := new(Cmp)
-		ret.Im = ret.Im.Neg(lc.Im)
-		ret.Re = lc.Re
-		return ret
-	})))
-
-	put(SUM, COMPLEX, COMPLEX, c_(c_c_(c_c_c_(func(rc *Cmp, lc *Cmp) *Cmp {
-		ret := new(Cmp)
-		ret.Re = lc.Re.Add(lc.Re, rc.Re)
-		ret.Im = lc.Im.Add(lc.Im, rc.Im)
-		return ret
-	}))))
-
-	put(DIFF, COMPLEX, COMPLEX, c_(c_c_(c_c_c_(func(rc *Cmp, lc *Cmp) *Cmp {
-		ret := new(Cmp)
-		ret.Re = lc.Re.Sub(lc.Re, rc.Re)
-		ret.Im = lc.Im.Sub(lc.Im, rc.Im)
-		return ret
-	}))))
-
-	put(MULT, COMPLEX, COMPLEX, c_(c_c_(c_c_c_(func(rc *Cmp, lc *Cmp) *Cmp {
-		panic("wrong")
-		ret := new(Cmp)
-		ret.Re = lc.Re.Mul(lc.Re, rc.Re)
-		ret.Im = lc.Im.Mul(lc.Im, rc.Im)
-		return ret
-	}))))
-
-	put(QUOT, COMPLEX, COMPLEX, c_(c_c_(c_c_c_(func(rc *Cmp, lc *Cmp) *Cmp {
-		panic("wrong")
-		ret := new(Cmp)
-		ret.Re = lc.Re.Quo(lc.Re, rc.Re)
-		ret.Im = lc.Im.Quo(lc.Im, rc.Im)
-		return ret
-	}))))
-}
-
-func init_MIXED_IR() {
-	put(SUM, INTEGER, RATIONAL, r_(r_ir_(r_ir_ir_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Add(lr, rr)
-	}))))
-
-	put(DIFF, INTEGER, RATIONAL, r_(r_ir_(r_ir_ir_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Sub(lr, rr)
-	}))))
-
-	put(MULT, INTEGER, RATIONAL, r_(r_ir_(r_ir_ir_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Mul(lr, rr)
-	}))))
-
-	put(QUOT, INTEGER, INTEGER, r_(r_ir_(r_ir_ir_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Quo(lr, rr)
-	}))))
-
-	put(QUOT, INTEGER, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Quo(lr, rr)
-	}))))
-}
-
-func init_MIXED_IC() {
-	put(SUM, INTEGER, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Add(lr, rc.Re)
-		return
-	}))))
-
-	put(DIFF, INTEGER, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Sub(lr, rc.Re)
-		return
-	}))))
-
-	put(MULT, INTEGER, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Mul(lr, rc.Re)
-		return
-	}))))
-
-	put(QUOT, INTEGER, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Quo(lr, rc.Re)
-		return
-	}))))
-}
-
-func init_MIXED_RI() {
-	put(SUM, RATIONAL, INTEGER, r_(r_ir_(r_ir_ir_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Add(lr, rr)
-	}))))
-
-	put(DIFF, RATIONAL, INTEGER, r_(r_ir_(r_ir_ir_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Sub(lr, rr)
-	}))))
-
-	put(MULT, RATIONAL, INTEGER, r_(r_ir_(r_ir_ir_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Mul(lr, rr)
-	}))))
-
-	put(QUOT, RATIONAL, INTEGER, r_(r_ir_(r_ir_ir_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Quo(lr, rr)
-	}))))
-}
-
-func init_MIXED_RC() {
-	put(SUM, RATIONAL, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Add(lr, rc.Re)
-		return
-	}))))
-
-	put(DIFF, RATIONAL, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Sub(lr, rc.Re)
-		return
-	}))))
-
-	put(MULT, RATIONAL, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Mul(lr, rc.Re)
-		return
-	}))))
-
-	put(QUOT, RATIONAL, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Quo(lr, rc.Re)
-		return
-	}))))
-}
-
-func init_MIXED_CI() {
-	put(SUM, COMPLEX, INTEGER, c_(c_c_(c_c_ir_(func(lc *Cmp, rr *big.Rat) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = lc.Im
-		ret.Re = rr.Add(rr, lc.Re)
-		return
-	}))))
-
-	put(DIFF, COMPLEX, INTEGER, c_(c_c_(c_c_ir_(func(lc *Cmp, rr *big.Rat) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = lc.Im
-		ret.Re = rr.Sub(lc.Re, rr)
-		return
-	}))))
-
-	put(MULT, COMPLEX, INTEGER, c_(c_c_(c_c_ir_(func(lc *Cmp, rr *big.Rat) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = lc.Im
-		ret.Re = rr.Mul(rr, lc.Re)
-		return
-	}))))
-
-	put(QUOT, COMPLEX, INTEGER, c_(c_c_(c_c_ir_(func(lc *Cmp, rr *big.Rat) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = lc.Im
-		ret.Re = rr.Quo(lc.Re, rr)
-		return
-	}))))
-}
-
-func init_MIXED_CR() {
-	put(SUM, COMPLEX, RATIONAL, c_(c_c_(c_c_ir_(func(lc *Cmp, rr *big.Rat) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = lc.Im
-		ret.Re = rr.Add(rr, lc.Re)
-		return
-	}))))
-
-	put(DIFF, COMPLEX, RATIONAL, c_(c_c_(c_c_ir_(func(lc *Cmp, rr *big.Rat) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = lc.Im
-		ret.Re = rr.Sub(lc.Re, rr)
-		return
-	}))))
-
-	put(MULT, COMPLEX, RATIONAL, c_(c_c_(c_c_ir_(func(lc *Cmp, rr *big.Rat) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = lc.Im
-		ret.Re = rr.Mul(rr, lc.Re)
-		return
-	}))))
-
-	put(QUOT, COMPLEX, RATIONAL, c_(c_c_(c_c_ir_(func(lc *Cmp, rr *big.Rat) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = lc.Im
-		ret.Re = rr.Quo(lc.Re, rr)
-		return
-	}))))
-}
-
-func init_MIXED() {
-	init_MIXED_IR()
-	init_MIXED_IC()
-
-	init_MIXED_RI()
-	init_MIXED_RC()
-
-	init_MIXED_CI()
-	init_MIXED_CR()
-}
-
 func init_ERR() {
 	_e := func(Value, Value) Value {
 		halt.As(100, "ЕГГОГ")
@@ -485,16 +214,25 @@ func init() {
 	init_INTEGER()
 	init_RATIONAL()
 	init_COMPLEX()
-	init_MIXED()
+
+	init_MIXED_IR()
+	init_MIXED_IC()
+
+	init_MIXED_RI()
+	init_MIXED_RC()
+
+	init_MIXED_CI()
+	init_MIXED_CR()
 
 	log.SetFlags(0)
+
 	for i := NoOp + 1; i < lastOp; i++ {
 		for l := NoType + 1; l < lastType; l++ {
 			for r := NoType; r < lastType; r++ {
 				if r != NoType || i.Monadic() {
 					k := key{i, l, r}
 					if _, ok := om[k]; !ok {
-						//panic(k)
+						panic(k)
 						log.Println(k)
 					}
 				}

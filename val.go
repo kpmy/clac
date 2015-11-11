@@ -1,6 +1,7 @@
 package clac
 
 import (
+	"fmt"
 	"github.com/kpmy/ypk/halt"
 	"math/big"
 	"reflect"
@@ -8,6 +9,10 @@ import (
 
 type Cmp struct {
 	Re, Im *big.Rat
+}
+
+func (c *Cmp) String() string {
+	return fmt.Sprint(c.Re, " + i", c.Im)
 }
 
 func (v Value) ToBool() (ret bool) {
@@ -74,6 +79,16 @@ func This(typ Type, _x interface{}) (ret Value) {
 			ret.V = r.SetFloat64(x)
 		default:
 			halt.As(102, reflect.TypeOf(x))
+		}
+	case COMPLEX:
+		switch x := _x.(type) {
+		case complex128:
+			c := new(Cmp)
+			c.Im = big.NewRat(0, 1)
+			c.Re = big.NewRat(0, 1)
+			c.Im = c.Im.SetFloat64(imag(x))
+			c.Re = c.Re.SetFloat64(real(x))
+			ret.V = c
 		}
 	default:
 		halt.As(100, typ)

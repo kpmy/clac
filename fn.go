@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	less = -1
-	eq   = 0
-	gtr  = 1
+	lss = -1
+	eq  = 0
+	gtr = 1
 )
 
 func b_(fn func(Value, Value) bool) func(Value, Value) Value {
@@ -30,6 +30,92 @@ func b_i_i_(fn func(*big.Int, *big.Int) bool) func(*big.Int, Value) bool {
 	return func(li *big.Int, r Value) bool {
 		ri := r.ToInt()
 		return fn(li, ri)
+	}
+}
+
+func b_r_(fn func(*big.Rat, Value) bool) func(Value, Value) bool {
+	return func(l Value, r Value) bool {
+		lr := l.ToRat()
+		return fn(lr, r)
+	}
+}
+
+func b_r_r_(fn func(*big.Rat, *big.Rat) bool) func(*big.Rat, Value) bool {
+	return func(lr *big.Rat, r Value) bool {
+		rr := r.ToRat()
+		return fn(lr, rr)
+	}
+}
+
+func b_ir_(fn func(*big.Rat, Value) bool) func(Value, Value) bool {
+	return func(l Value, r Value) bool {
+		if l.T == RATIONAL {
+			lr := l.ToRat()
+			return fn(lr, r)
+		} else if l.T == INTEGER {
+			li := l.ToInt()
+			lr := big.NewRat(0, 1)
+			lr.SetInt(li)
+			return fn(lr, r)
+		} else {
+			halt.As(100, "cannot convert")
+		}
+		panic(0)
+	}
+}
+
+func b_ir_ir_(fn func(*big.Rat, *big.Rat) bool) func(*big.Rat, Value) bool {
+	return func(lr *big.Rat, r Value) bool {
+		if r.T == RATIONAL {
+			rr := r.ToRat()
+			return fn(lr, rr)
+		} else if r.T == INTEGER {
+			ri := r.ToInt()
+			rr := big.NewRat(0, 1)
+			rr.SetInt(ri)
+			return fn(lr, rr)
+		} else {
+			halt.As(100, "cannot convert")
+		}
+		panic(0)
+	}
+}
+
+func b_c_(fn func(*Cmp, Value) bool) func(Value, Value) bool {
+	return func(l Value, r Value) bool {
+		lc := l.ToCmp()
+		return fn(lc, r)
+	}
+}
+
+func b_c_c_(fn func(*Cmp, *Cmp) bool) func(*Cmp, Value) bool {
+	return func(lc *Cmp, r Value) bool {
+		rc := r.ToCmp()
+		return fn(lc, rc)
+	}
+}
+
+func b_c_ir_(fn func(*Cmp, *big.Rat) bool) func(*Cmp, Value) bool {
+	return func(lc *Cmp, r Value) bool {
+		if r.T == RATIONAL {
+			rr := r.ToRat()
+			return fn(lc, rr)
+		} else if r.T == INTEGER {
+			ri := r.ToInt()
+			rr := big.NewRat(0, 1)
+			rr.SetInt(ri)
+			return fn(lc, rr)
+		} else {
+			halt.As(100, "cannot convert")
+		}
+		panic(0)
+	}
+}
+
+func b_ir_c_(fn func(*big.Rat, *Cmp) bool) func(*big.Rat, Value) bool {
+	return func(lr *big.Rat, r Value) bool {
+		rc := r.ToCmp()
+		return fn(lr, rc)
 	}
 }
 
