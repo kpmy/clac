@@ -12,7 +12,7 @@ type Cmp struct {
 }
 
 func (c *Cmp) String() string {
-	return fmt.Sprint(c.Re, " + i", c.Im)
+	return fmt.Sprint(c.Re.FloatString(2), " ", c.Im.FloatString(2), "i")
 }
 
 func (v Value) ToBool() (ret bool) {
@@ -38,6 +38,9 @@ func (v Value) ToInt() (ret *big.Int) {
 
 func (v Value) ToRat() (ret *big.Rat) {
 	switch v.T {
+	case INTEGER:
+		ret = big.NewRat(0, 1)
+		ret.SetInt(v.V.(*big.Int))
 	case RATIONAL:
 		ret = big.NewRat(0, 1)
 		ret.Add(ret, v.V.(*big.Rat))
@@ -99,7 +102,7 @@ func This(typ Type, _x interface{}) (ret Value) {
 
 func thisVal(x interface{}) (ret interface{}) {
 	switch x.(type) {
-	case *big.Int, *big.Rat:
+	case *big.Int, *big.Rat, *Cmp:
 		ret = x
 	default:
 		halt.As(100, reflect.TypeOf(x))

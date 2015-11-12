@@ -30,10 +30,6 @@ func init_INTEGER() {
 
 	}))))
 
-	put(POW, INTEGER, INTEGER, i_(i_i_(i_i_i_(func(li *big.Int, ri *big.Int) *big.Int {
-		panic("wrong")
-	}))))
-
 	put(EQ, INTEGER, INTEGER, b_(b_i_(b_i_i_(func(li *big.Int, ri *big.Int) bool {
 		res := li.Cmp(ri)
 		return res == eq

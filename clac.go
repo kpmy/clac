@@ -5,6 +5,7 @@ import (
 	"github.com/kpmy/ypk/assert"
 	"github.com/kpmy/ypk/halt"
 	"log"
+	"math/big"
 	"strconv"
 )
 
@@ -17,19 +18,38 @@ type Value struct {
 	V interface{}
 }
 
+func (v Value) String() string {
+	switch v.T {
+	case INTEGER:
+		return fmt.Sprint(v.V)
+	case RATIONAL:
+		return fmt.Sprint(v.V.(*big.Rat).FloatString(2))
+	case COMPLEX:
+		return fmt.Sprint(v.V)
+	case BOOLEAN:
+		return fmt.Sprint(v.V)
+	case ErrType:
+		return "error"
+	default:
+		return fmt.Sprint("unknown type ", v.T)
+	}
+}
+
 type key struct {
 	op Op
 	l  Type
 	r  Type
 }
 
+const ErrType Type = -1
+
 const (
 	NoType Type = iota
 	INTEGER
 	RATIONAL
 	COMPLEX
-	BOOLEAN
 
+	BOOLEAN
 	lastType
 )
 
@@ -119,28 +139,41 @@ func (o Op) Monadic() bool {
 	return o == NEG || o == CON
 }
 
+type dfs struct {
+	f   dfn
+	err bool
+}
+
 type dfn func(Value, Value) Value
 
-var om map[key]dfn
+var om map[key]dfs
 var dummy Value
+
+func put2(op Op, l Type, r Type, fn dfn, err bool) {
+	key := key{op, l, r}
+	if _, ok := om[key]; !ok {
+		om[key] = dfs{f: fn, err: err}
+	} else {
+		halt.As(100, "op already exists ", key)
+	}
+}
 
 func put(op Op, l Type, r Type, fn dfn) {
 	key := key{op, l, r}
 	if _, ok := om[key]; !ok {
-		om[key] = fn
+		om[key] = dfs{f: fn, err: false}
 	} else {
 		halt.As(100, "op already exists ", key)
 	}
 }
 
 func init_ERR() {
-	_e := func(Value, Value) Value {
-		halt.As(100, "ЕГГОГ")
-		panic(0)
-	}
 
 	err := func(op Op, r Type, l Type) {
-		put(op, r, l, _e)
+		put2(op, r, l, func(Value, Value) Value {
+			halt.As(100, "ЕГГОГ", " ", op, " ", l, " ", r)
+			panic(0)
+		}, true)
 	}
 
 	err(DIV, RATIONAL, RATIONAL)
@@ -208,7 +241,7 @@ func init_ERR() {
 }
 
 func init() {
-	om = make(map[key]dfn)
+	om = make(map[key]dfs)
 	init_ERR()
 
 	init_INTEGER()
@@ -241,26 +274,66 @@ func init() {
 	}
 }
 
+func wrap(f dfn, left, right Value) (ret Value) {
+	defer func() {
+		if x := recover(); x != nil {
+			if s, ok := x.(string); ok && s == "division by zero" {
+				//ok
+			} else {
+				panic(x)
+			}
+		}
+	}()
+
+	ret.T = ErrType
+	ret = f(left, right)
+	return
+}
+
 func Do(op Op, value Value) (ret Value) {
 	assert.For(op.Monadic(), 20)
-	log.Println(op, value)
+	//log.Println(op, value)
 	if f, ok := om[key{op: op, l: value.T}]; ok {
-		ret = f(value, dummy)
+		ret = wrap(f.f, value, dummy)
 	} else {
 		halt.As(100, op, value)
 	}
-	log.Println(ret)
+	//log.Println(ret)
 	return
 }
 
 func Do2(left Value, op Op, right Value) (ret Value) {
 	assert.For(!op.Monadic(), 20)
-	log.Println(left, op, right)
+	//log.Println(left, op, right)
 	if f, ok := om[key{op: op, l: left.T, r: right.T}]; ok {
-		ret = f(left, right)
+		ret = wrap(f.f, left, right)
 	} else {
 		halt.As(100, op, left, right)
 	}
-	log.Println(ret)
+	//log.Println(ret)
 	return
+}
+
+func Forbidden(op Op, typ ...Type) bool {
+	switch len(typ) {
+	case 0:
+		return true
+	case 1:
+		if !op.Monadic() {
+			return true
+		} else {
+			if f, ok := om[key{op: op, l: typ[0]}]; ok {
+				return f.err
+			}
+		}
+	case 2:
+		if op.Monadic() {
+			return Forbidden(op, typ[0])
+		} else {
+			if f, ok := om[key{op: op, l: typ[0], r: typ[1]}]; ok {
+				return f.err
+			}
+		}
+	}
+	return false
 }

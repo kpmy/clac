@@ -29,6 +29,22 @@ func init_MIXED_IR() {
 		panic("wrong")
 	}))))
 
+	put(POW, INTEGER, INTEGER, r_(r_ir_(r_ir_ir_(func(li *big.Rat, ri *big.Rat) *big.Rat {
+		switch ri.Cmp(big.NewRat(0, 1)) {
+		case eq:
+			return big.NewRat(1, 1)
+		case gtr:
+			t := li.Num().Exp(li.Num(), ri.Num(), nil)
+			ret := big.NewRat(0, 1)
+			return ret.SetInt(t)
+		case lss:
+			t := li.Num().Exp(li.Num(), ri.Num().Neg(ri.Num()), nil)
+			ret := big.NewRat(0, 1)
+			return ret.SetFrac(big.NewInt(1), t)
+		}
+		panic("wrong")
+	}))))
+
 	put(LSS, INTEGER, RATIONAL, b_(b_ir_(b_ir_ir_(func(lr *big.Rat, rr *big.Rat) bool {
 		res := lr.Cmp(rr)
 		return res == lss

@@ -10,7 +10,7 @@ func init_COMPLEX() {
 
 	put(CON, COMPLEX, NoType, c_(c_c_(func(lc *Cmp, r Value) *Cmp {
 		ret := new(Cmp)
-		ret.Im = ret.Im.Neg(lc.Im)
+		ret.Im = lc.Im.Neg(lc.Im)
 		ret.Re = lc.Re
 		return ret
 	})))
