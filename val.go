@@ -1,19 +1,9 @@
 package clac
 
 import (
-	"fmt"
 	"github.com/kpmy/ypk/halt"
-	"math/big"
 	"reflect"
 )
-
-type Cmp struct {
-	Re, Im *big.Rat
-}
-
-func (c *Cmp) String() string {
-	return fmt.Sprint(c.Re.FloatString(2), " ", c.Im.FloatString(2), "i")
-}
 
 func (v Value) ToBool() (ret bool) {
 	switch v.T {
@@ -25,25 +15,22 @@ func (v Value) ToBool() (ret bool) {
 	return
 }
 
-func (v Value) ToInt() (ret *big.Int) {
+func (v Value) ToInt() (ret int64) {
 	switch v.T {
 	case INTEGER:
-		ret = big.NewInt(0)
-		ret.Add(ret, v.V.(*big.Int))
+		ret = v.V.(int64)
 	default:
 		halt.As(100, v.T)
 	}
 	return
 }
 
-func (v Value) ToRat() (ret *big.Rat) {
+func (v Value) ToFlo() (ret float64) {
 	switch v.T {
 	case INTEGER:
-		ret = big.NewRat(0, 1)
-		ret.SetInt(v.V.(*big.Int))
-	case RATIONAL:
-		ret = big.NewRat(0, 1)
-		ret.Add(ret, v.V.(*big.Rat))
+		ret = float64(v.V.(int64))
+	case FLOAT:
+		ret = v.V.(float64)
 	default:
 		halt.As(100, v.T)
 
@@ -51,14 +38,10 @@ func (v Value) ToRat() (ret *big.Rat) {
 	return
 }
 
-func (v Value) ToCmp() (ret *Cmp) {
+func (v Value) ToCmp() (ret complex128) {
 	switch v.T {
 	case COMPLEX:
-		ret = new(Cmp)
-		ret.Re = big.NewRat(0, 1)
-		ret.Im = big.NewRat(0, 1)
-		ret.Re.Add(ret.Re, v.V.(*Cmp).Re)
-		ret.Im.Add(ret.Im, v.V.(*Cmp).Im)
+		ret = v.V.(complex128)
 	default:
 		halt.As(100, v.T)
 
@@ -70,28 +53,24 @@ func This(typ Type, _x interface{}) (ret Value) {
 	switch typ {
 	case INTEGER:
 		switch x := _x.(type) {
+		case int64:
+			ret.V = x
 		case int:
-			ret.V = big.NewInt(int64(x))
+			ret.V = int64(x)
 		default:
 			halt.As(101, reflect.TypeOf(x))
 		}
-	case RATIONAL:
+	case FLOAT:
 		switch x := _x.(type) {
 		case float64:
-			r := big.NewRat(0, 1)
-			ret.V = r.SetFloat64(x)
+			ret.V = x
 		default:
 			halt.As(102, reflect.TypeOf(x))
 		}
 	case COMPLEX:
 		switch x := _x.(type) {
 		case complex128:
-			c := new(Cmp)
-			c.Im = big.NewRat(0, 1)
-			c.Re = big.NewRat(0, 1)
-			c.Im = c.Im.SetFloat64(imag(x))
-			c.Re = c.Re.SetFloat64(real(x))
-			ret.V = c
+			ret.V = x
 		}
 	default:
 		halt.As(100, typ)
@@ -102,7 +81,7 @@ func This(typ Type, _x interface{}) (ret Value) {
 
 func thisVal(x interface{}) (ret interface{}) {
 	switch x.(type) {
-	case *big.Int, *big.Rat, *Cmp:
+	case int64, complex128, float64:
 		ret = x
 	default:
 		halt.As(100, reflect.TypeOf(x))

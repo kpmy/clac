@@ -11,16 +11,16 @@ import (
 func TestClac(t *testing.T) {
 	i := This(INTEGER, 4)
 	t.Log(Do(NEG, i))
-	r := This(RATIONAL, 5.8)
+	r := This(FLOAT, 5.8)
 	t.Log(Do(NEG, r))
 }
 
-func Int(x int) Value {
+func Int(x int64) Value {
 	return This(INTEGER, x)
 }
 
-func Rat(x float64) Value {
-	return This(RATIONAL, x)
+func Flo(x float64) Value {
+	return This(FLOAT, x)
 }
 
 func Cpx(x complex128) Value {
@@ -32,9 +32,9 @@ var rnd *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
 func Rnd(t Type) (ret Value) {
 	switch t {
 	case INTEGER:
-		ret = Int(rnd.Intn(10) - 5)
-	case RATIONAL:
-		ret = Rat(10*rnd.Float64() - 5)
+		ret = Int(rnd.Int63n(10) - 5)
+	case FLOAT:
+		ret = Flo(10*rnd.Float64() - 5)
 	case COMPLEX:
 		ret = Cpx(complex(10*rnd.Float64()-5, 10*rnd.Float64()-5))
 	default:
@@ -49,7 +49,7 @@ func TestSome(t *testing.T) {
 	assert.For(Do2(Do2(Int(4), MULT, Int(24)), EQ, Int(4*24)).ToBool(), 20)
 	t.Log(Do2(Int(4), QUOT, Int(24)))
 	t.Log(Do(NEG, Int(45)))
-	t.Log(Rat(34.5))
+	t.Log(Flo(34.5))
 	t.Log(Cpx(complex(3, 5)))
 	t.Log(Do(CON, Cpx(complex(3.5, 14))))
 }

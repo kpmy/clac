@@ -5,7 +5,6 @@ import (
 	"github.com/kpmy/ypk/assert"
 	"github.com/kpmy/ypk/halt"
 	"log"
-	"math/big"
 	"strconv"
 )
 
@@ -22,8 +21,8 @@ func (v Value) String() string {
 	switch v.T {
 	case INTEGER:
 		return fmt.Sprint(v.V)
-	case RATIONAL:
-		return fmt.Sprint(v.V.(*big.Rat).FloatString(2))
+	case FLOAT:
+		return fmt.Sprint(v.V)
 	case COMPLEX:
 		return fmt.Sprint(v.V)
 	case BOOLEAN:
@@ -46,7 +45,7 @@ const ErrType Type = -1
 const (
 	NoType Type = iota
 	INTEGER
-	RATIONAL
+	FLOAT
 	COMPLEX
 
 	BOOLEAN
@@ -89,8 +88,8 @@ func (t Type) String() string {
 		return "INTEGER"
 	case COMPLEX:
 		return "COMPLEX"
-	case RATIONAL:
-		return "RATIONAL"
+	case FLOAT:
+		return "FLOAT"
 	case BOOLEAN:
 		return "BOOLEAN"
 	default:
@@ -176,21 +175,21 @@ func init_ERR() {
 		}, true)
 	}
 
-	err(DIV, RATIONAL, RATIONAL)
-	err(DIV, RATIONAL, INTEGER)
-	err(DIV, INTEGER, RATIONAL)
+	err(DIV, FLOAT, FLOAT)
+	err(DIV, FLOAT, INTEGER)
+	err(DIV, INTEGER, FLOAT)
 	err(DIV, COMPLEX, COMPLEX)
-	err(DIV, RATIONAL, COMPLEX)
-	err(DIV, COMPLEX, RATIONAL)
+	err(DIV, FLOAT, COMPLEX)
+	err(DIV, COMPLEX, FLOAT)
 	err(DIV, COMPLEX, INTEGER)
 	err(DIV, INTEGER, COMPLEX)
 
-	err(MOD, RATIONAL, RATIONAL)
-	err(MOD, RATIONAL, INTEGER)
-	err(MOD, INTEGER, RATIONAL)
+	err(MOD, FLOAT, FLOAT)
+	err(MOD, FLOAT, INTEGER)
+	err(MOD, INTEGER, FLOAT)
 	err(MOD, COMPLEX, COMPLEX)
-	err(MOD, RATIONAL, COMPLEX)
-	err(MOD, COMPLEX, RATIONAL)
+	err(MOD, FLOAT, COMPLEX)
+	err(MOD, COMPLEX, FLOAT)
 	err(MOD, COMPLEX, INTEGER)
 	err(MOD, INTEGER, COMPLEX)
 
@@ -237,7 +236,7 @@ func init_ERR() {
 	}
 
 	err(CON, INTEGER, NoType)
-	err(CON, RATIONAL, NoType)
+	err(CON, FLOAT, NoType)
 }
 
 func init() {
@@ -245,7 +244,7 @@ func init() {
 	init_ERR()
 
 	init_INTEGER()
-	init_RATIONAL()
+	init_FLOAT()
 	init_COMPLEX()
 
 	init_MIXED_IR()

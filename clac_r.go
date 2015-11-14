@@ -1,61 +1,51 @@
 package clac
 
-import (
-	"math/big"
-)
-
-func init_RATIONAL() {
-	put(NEG, RATIONAL, NoType, r_(r_r_(func(lr *big.Rat, r Value) *big.Rat {
-		return lr.Neg(lr)
+func init_FLOAT() {
+	put(NEG, FLOAT, NoType, r_(r_r_(func(lr float64, r Value) float64 {
+		return -lr
 	})))
 
-	put(SUM, RATIONAL, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Add(lr, rr)
+	put(SUM, FLOAT, FLOAT, r_(r_r_(r_r_r_(func(lr float64, rr float64) float64 {
+		return lr + rr
 	}))))
 
-	put(DIFF, RATIONAL, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Sub(lr, rr)
+	put(DIFF, FLOAT, FLOAT, r_(r_r_(r_r_r_(func(lr float64, rr float64) float64 {
+		return lr - rr
 	}))))
 
-	put(MULT, RATIONAL, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Mul(lr, rr)
+	put(MULT, FLOAT, FLOAT, r_(r_r_(r_r_r_(func(lr float64, rr float64) float64 {
+		return lr * rr
 	}))))
 
-	put(QUOT, RATIONAL, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
-		return lr.Quo(lr, rr)
+	put(QUOT, FLOAT, FLOAT, r_(r_r_(r_r_r_(func(lr float64, rr float64) float64 {
+		return lr / rr
 	}))))
 
-	put(POW, RATIONAL, RATIONAL, r_(r_r_(r_r_r_(func(lr *big.Rat, rr *big.Rat) *big.Rat {
+	put(POW, FLOAT, FLOAT, r_(r_r_(r_r_r_(func(lr float64, rr float64) float64 {
 		panic("wrong")
 	}))))
 
-	put(LSS, RATIONAL, RATIONAL, b_(b_ir_(b_ir_ir_(func(lr *big.Rat, rr *big.Rat) bool {
-		res := lr.Cmp(rr)
-		return res == lss
+	put(LSS, FLOAT, FLOAT, b_(b_ir_(b_ir_ir_(func(lr float64, rr float64) bool {
+		return lr < rr
 	}))))
 
-	put(LEQ, RATIONAL, RATIONAL, b_(b_ir_(b_ir_ir_(func(lr *big.Rat, rr *big.Rat) bool {
-		res := lr.Cmp(rr)
-		return res != gtr
+	put(LEQ, FLOAT, FLOAT, b_(b_ir_(b_ir_ir_(func(lr float64, rr float64) bool {
+		return lr <= rr
 	}))))
 
-	put(GEQ, RATIONAL, RATIONAL, b_(b_ir_(b_ir_ir_(func(lr *big.Rat, rr *big.Rat) bool {
-		res := lr.Cmp(rr)
-		return res != lss
+	put(GEQ, FLOAT, FLOAT, b_(b_ir_(b_ir_ir_(func(lr float64, rr float64) bool {
+		return lr >= rr
 	}))))
 
-	put(GTR, RATIONAL, RATIONAL, b_(b_ir_(b_ir_ir_(func(lr *big.Rat, rr *big.Rat) bool {
-		res := lr.Cmp(rr)
-		return res == gtr
+	put(GTR, FLOAT, FLOAT, b_(b_ir_(b_ir_ir_(func(lr float64, rr float64) bool {
+		return lr > rr
 	}))))
 
-	put(EQ, RATIONAL, RATIONAL, b_(b_ir_(b_ir_ir_(func(lr *big.Rat, rr *big.Rat) bool {
-		res := lr.Cmp(rr)
-		return res == eq
+	put(EQ, FLOAT, FLOAT, b_(b_ir_(b_ir_ir_(func(lr float64, rr float64) bool {
+		return lr == rr
 	}))))
 
-	put(NEQ, RATIONAL, RATIONAL, b_(b_ir_(b_ir_ir_(func(lr *big.Rat, rr *big.Rat) bool {
-		res := lr.Cmp(rr)
-		return res != eq
+	put(NEQ, FLOAT, FLOAT, b_(b_ir_(b_ir_ir_(func(lr float64, rr float64) bool {
+		return lr != rr
 	}))))
 }

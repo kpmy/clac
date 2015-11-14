@@ -1,65 +1,47 @@
 package clac
 
-import (
-	"math/big"
-)
-
 func init_MIXED_RC() {
-	put(SUM, RATIONAL, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Add(lr, rc.Re)
-		return
+	put(SUM, FLOAT, COMPLEX, c_(c_ir_(c_ir_c_(func(lr float64, rc complex128) (ret complex128) {
+		return complex(lr, 0) + rc
 	}))))
 
-	put(DIFF, RATIONAL, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Sub(lr, rc.Re)
-		return
+	put(DIFF, FLOAT, COMPLEX, c_(c_ir_(c_ir_c_(func(lr float64, rc complex128) (ret complex128) {
+		return complex(lr, 0) - rc
 	}))))
 
-	put(MULT, RATIONAL, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Mul(lr, rc.Re)
-		return
+	put(MULT, FLOAT, COMPLEX, c_(c_ir_(c_ir_c_(func(lr float64, rc complex128) (ret complex128) {
+		return complex(lr, 0) * rc
 	}))))
 
-	put(QUOT, RATIONAL, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
-		panic("wrong")
-		ret = new(Cmp)
-		ret.Im = rc.Im
-		ret.Re = lr.Quo(lr, rc.Re)
-		return
+	put(QUOT, FLOAT, COMPLEX, c_(c_ir_(c_ir_c_(func(lr float64, rc complex128) (ret complex128) {
+		return complex(lr, 0) / rc
 	}))))
 
-	put(POW, RATIONAL, COMPLEX, c_(c_ir_(c_ir_c_(func(lr *big.Rat, rc *Cmp) (ret *Cmp) {
+	put(POW, FLOAT, COMPLEX, c_(c_ir_(c_ir_c_(func(lr float64, rc complex128) (ret complex128) {
 		panic("wrong")
 	}))))
 
-	put(LSS, RATIONAL, COMPLEX, b_(b_ir_(b_ir_c_(func(lr *big.Rat, rc *Cmp) bool {
+	put(LSS, FLOAT, COMPLEX, b_(b_ir_(b_ir_c_(func(lr float64, rc complex128) bool {
 		panic("wrong")
 	}))))
 
-	put(LEQ, RATIONAL, COMPLEX, b_(b_ir_(b_ir_c_(func(lr *big.Rat, rc *Cmp) bool {
+	put(LEQ, FLOAT, COMPLEX, b_(b_ir_(b_ir_c_(func(lr float64, rc complex128) bool {
 		panic("wrong")
 	}))))
 
-	put(GEQ, RATIONAL, COMPLEX, b_(b_ir_(b_ir_c_(func(lr *big.Rat, rc *Cmp) bool {
+	put(GEQ, FLOAT, COMPLEX, b_(b_ir_(b_ir_c_(func(lr float64, rc complex128) bool {
 		panic("wrong")
 	}))))
 
-	put(GTR, RATIONAL, COMPLEX, b_(b_ir_(b_ir_c_(func(lr *big.Rat, rc *Cmp) bool {
+	put(GTR, FLOAT, COMPLEX, b_(b_ir_(b_ir_c_(func(lr float64, rc complex128) bool {
 		panic("wrong")
 	}))))
 
-	put(EQ, RATIONAL, COMPLEX, b_(b_ir_(b_ir_c_(func(lr *big.Rat, rc *Cmp) bool {
+	put(EQ, FLOAT, COMPLEX, b_(b_ir_(b_ir_c_(func(lr float64, rc complex128) bool {
 		panic("wrong")
 	}))))
 
-	put(NEQ, RATIONAL, COMPLEX, b_(b_ir_(b_ir_c_(func(lr *big.Rat, rc *Cmp) bool {
+	put(NEQ, FLOAT, COMPLEX, b_(b_ir_(b_ir_c_(func(lr float64, rc complex128) bool {
 		panic("wrong")
 	}))))
 }

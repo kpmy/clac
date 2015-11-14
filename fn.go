@@ -2,13 +2,6 @@ package clac
 
 import (
 	"github.com/kpmy/ypk/halt"
-	"math/big"
-)
-
-const (
-	lss = -1
-	eq  = 0
-	gtr = 1
 )
 
 func b_(fn func(Value, Value) bool) func(Value, Value) Value {
@@ -19,43 +12,41 @@ func b_(fn func(Value, Value) bool) func(Value, Value) Value {
 	}
 }
 
-func b_i_(fn func(*big.Int, Value) bool) func(Value, Value) bool {
+func b_i_(fn func(int64, Value) bool) func(Value, Value) bool {
 	return func(l Value, r Value) bool {
 		li := l.ToInt()
 		return fn(li, r)
 	}
 }
 
-func b_i_i_(fn func(*big.Int, *big.Int) bool) func(*big.Int, Value) bool {
-	return func(li *big.Int, r Value) bool {
+func b_i_i_(fn func(int64, int64) bool) func(int64, Value) bool {
+	return func(li int64, r Value) bool {
 		ri := r.ToInt()
 		return fn(li, ri)
 	}
 }
 
-func b_r_(fn func(*big.Rat, Value) bool) func(Value, Value) bool {
+func b_r_(fn func(float64, Value) bool) func(Value, Value) bool {
 	return func(l Value, r Value) bool {
-		lr := l.ToRat()
+		lr := l.ToFlo()
 		return fn(lr, r)
 	}
 }
 
-func b_r_r_(fn func(*big.Rat, *big.Rat) bool) func(*big.Rat, Value) bool {
-	return func(lr *big.Rat, r Value) bool {
-		rr := r.ToRat()
+func b_r_r_(fn func(float64, float64) bool) func(float64, Value) bool {
+	return func(lr float64, r Value) bool {
+		rr := r.ToFlo()
 		return fn(lr, rr)
 	}
 }
 
-func b_ir_(fn func(*big.Rat, Value) bool) func(Value, Value) bool {
+func b_ir_(fn func(float64, Value) bool) func(Value, Value) bool {
 	return func(l Value, r Value) bool {
-		if l.T == RATIONAL {
-			lr := l.ToRat()
+		if l.T == FLOAT {
+			lr := l.ToFlo()
 			return fn(lr, r)
 		} else if l.T == INTEGER {
-			li := l.ToInt()
-			lr := big.NewRat(0, 1)
-			lr.SetInt(li)
+			lr := l.ToFlo()
 			return fn(lr, r)
 		} else {
 			halt.As(100, "cannot convert")
@@ -64,15 +55,13 @@ func b_ir_(fn func(*big.Rat, Value) bool) func(Value, Value) bool {
 	}
 }
 
-func b_ir_ir_(fn func(*big.Rat, *big.Rat) bool) func(*big.Rat, Value) bool {
-	return func(lr *big.Rat, r Value) bool {
-		if r.T == RATIONAL {
-			rr := r.ToRat()
+func b_ir_ir_(fn func(float64, float64) bool) func(float64, Value) bool {
+	return func(lr float64, r Value) bool {
+		if r.T == FLOAT {
+			rr := r.ToFlo()
 			return fn(lr, rr)
 		} else if r.T == INTEGER {
-			ri := r.ToInt()
-			rr := big.NewRat(0, 1)
-			rr.SetInt(ri)
+			rr := r.ToFlo()
 			return fn(lr, rr)
 		} else {
 			halt.As(100, "cannot convert")
@@ -81,29 +70,27 @@ func b_ir_ir_(fn func(*big.Rat, *big.Rat) bool) func(*big.Rat, Value) bool {
 	}
 }
 
-func b_c_(fn func(*Cmp, Value) bool) func(Value, Value) bool {
+func b_c_(fn func(complex128, Value) bool) func(Value, Value) bool {
 	return func(l Value, r Value) bool {
 		lc := l.ToCmp()
 		return fn(lc, r)
 	}
 }
 
-func b_c_c_(fn func(*Cmp, *Cmp) bool) func(*Cmp, Value) bool {
-	return func(lc *Cmp, r Value) bool {
+func b_c_c_(fn func(complex128, complex128) bool) func(complex128, Value) bool {
+	return func(lc complex128, r Value) bool {
 		rc := r.ToCmp()
 		return fn(lc, rc)
 	}
 }
 
-func b_c_ir_(fn func(*Cmp, *big.Rat) bool) func(*Cmp, Value) bool {
-	return func(lc *Cmp, r Value) bool {
-		if r.T == RATIONAL {
-			rr := r.ToRat()
+func b_c_ir_(fn func(complex128, float64) bool) func(complex128, Value) bool {
+	return func(lc complex128, r Value) bool {
+		if r.T == FLOAT {
+			rr := r.ToFlo()
 			return fn(lc, rr)
 		} else if r.T == INTEGER {
-			ri := r.ToInt()
-			rr := big.NewRat(0, 1)
-			rr.SetInt(ri)
+			rr := r.ToFlo()
 			return fn(lc, rr)
 		} else {
 			halt.As(100, "cannot convert")
@@ -112,14 +99,14 @@ func b_c_ir_(fn func(*Cmp, *big.Rat) bool) func(*Cmp, Value) bool {
 	}
 }
 
-func b_ir_c_(fn func(*big.Rat, *Cmp) bool) func(*big.Rat, Value) bool {
-	return func(lr *big.Rat, r Value) bool {
+func b_ir_c_(fn func(float64, complex128) bool) func(float64, Value) bool {
+	return func(lr float64, r Value) bool {
 		rc := r.ToCmp()
 		return fn(lr, rc)
 	}
 }
 
-func i_(fn func(Value, Value) *big.Int) func(Value, Value) Value {
+func i_(fn func(Value, Value) int64) func(Value, Value) Value {
 	return func(l Value, r Value) (ret Value) {
 		ret = Value{T: INTEGER}
 		ret.V = thisVal(fn(l, r))
@@ -127,51 +114,49 @@ func i_(fn func(Value, Value) *big.Int) func(Value, Value) Value {
 	}
 }
 
-func i_i_(fn func(*big.Int, Value) *big.Int) func(Value, Value) *big.Int {
-	return func(l Value, r Value) *big.Int {
+func i_i_(fn func(int64, Value) int64) func(Value, Value) int64 {
+	return func(l Value, r Value) int64 {
 		li := l.ToInt()
 		return fn(li, r)
 	}
 }
 
-func i_i_i_(fn func(*big.Int, *big.Int) *big.Int) func(*big.Int, Value) *big.Int {
-	return func(li *big.Int, r Value) *big.Int {
+func i_i_i_(fn func(int64, int64) int64) func(int64, Value) int64 {
+	return func(li int64, r Value) int64 {
 		ri := r.ToInt()
 		return fn(li, ri)
 	}
 }
 
-func r_(fn func(Value, Value) *big.Rat) func(Value, Value) Value {
+func r_(fn func(Value, Value) float64) func(Value, Value) Value {
 	return func(l Value, r Value) (ret Value) {
-		ret = Value{T: RATIONAL}
+		ret = Value{T: FLOAT}
 		ret.V = thisVal(fn(l, r))
 		return
 	}
 }
 
-func r_r_(fn func(*big.Rat, Value) *big.Rat) func(Value, Value) *big.Rat {
-	return func(l Value, r Value) *big.Rat {
-		lr := l.ToRat()
+func r_r_(fn func(float64, Value) float64) func(Value, Value) float64 {
+	return func(l Value, r Value) float64 {
+		lr := l.ToFlo()
 		return fn(lr, r)
 	}
 }
 
-func r_r_r_(fn func(*big.Rat, *big.Rat) *big.Rat) func(*big.Rat, Value) *big.Rat {
-	return func(lr *big.Rat, r Value) *big.Rat {
-		rr := r.ToRat()
+func r_r_r_(fn func(float64, float64) float64) func(float64, Value) float64 {
+	return func(lr float64, r Value) float64 {
+		rr := r.ToFlo()
 		return fn(lr, rr)
 	}
 }
 
-func r_ir_(fn func(*big.Rat, Value) *big.Rat) func(Value, Value) *big.Rat {
-	return func(l Value, r Value) *big.Rat {
-		if l.T == RATIONAL {
-			lr := l.ToRat()
+func r_ir_(fn func(float64, Value) float64) func(Value, Value) float64 {
+	return func(l Value, r Value) float64 {
+		if l.T == FLOAT {
+			lr := l.ToFlo()
 			return fn(lr, r)
 		} else if l.T == INTEGER {
-			li := l.ToInt()
-			lr := big.NewRat(0, 1)
-			lr.SetInt(li)
+			lr := l.ToFlo()
 			return fn(lr, r)
 		} else {
 			halt.As(100, "cannot convert")
@@ -180,15 +165,13 @@ func r_ir_(fn func(*big.Rat, Value) *big.Rat) func(Value, Value) *big.Rat {
 	}
 }
 
-func r_ir_ir_(fn func(*big.Rat, *big.Rat) *big.Rat) func(*big.Rat, Value) *big.Rat {
-	return func(lr *big.Rat, r Value) *big.Rat {
-		if r.T == RATIONAL {
-			rr := r.ToRat()
+func r_ir_ir_(fn func(float64, float64) float64) func(float64, Value) float64 {
+	return func(lr float64, r Value) float64 {
+		if r.T == FLOAT {
+			rr := r.ToFlo()
 			return fn(lr, rr)
 		} else if r.T == INTEGER {
-			ri := r.ToInt()
-			rr := big.NewRat(0, 1)
-			rr.SetInt(ri)
+			rr := r.ToFlo()
 			return fn(lr, rr)
 		} else {
 			halt.As(100, "cannot convert")
@@ -197,7 +180,7 @@ func r_ir_ir_(fn func(*big.Rat, *big.Rat) *big.Rat) func(*big.Rat, Value) *big.R
 	}
 }
 
-func c_(fn func(Value, Value) *Cmp) func(Value, Value) Value {
+func c_(fn func(Value, Value) complex128) func(Value, Value) Value {
 	return func(l Value, r Value) (ret Value) {
 		ret = Value{T: COMPLEX}
 		ret.V = thisVal(fn(l, r))
@@ -205,29 +188,27 @@ func c_(fn func(Value, Value) *Cmp) func(Value, Value) Value {
 	}
 }
 
-func c_c_(fn func(*Cmp, Value) *Cmp) func(Value, Value) *Cmp {
-	return func(l Value, r Value) *Cmp {
+func c_c_(fn func(complex128, Value) complex128) func(Value, Value) complex128 {
+	return func(l Value, r Value) complex128 {
 		lc := l.ToCmp()
 		return fn(lc, r)
 	}
 }
 
-func c_c_c_(fn func(*Cmp, *Cmp) *Cmp) func(*Cmp, Value) *Cmp {
-	return func(lc *Cmp, r Value) *Cmp {
+func c_c_c_(fn func(complex128, complex128) complex128) func(complex128, Value) complex128 {
+	return func(lc complex128, r Value) complex128 {
 		rc := r.ToCmp()
 		return fn(lc, rc)
 	}
 }
 
-func c_ir_(fn func(*big.Rat, Value) *Cmp) func(Value, Value) *Cmp {
-	return func(l Value, r Value) *Cmp {
-		if l.T == RATIONAL {
-			lr := l.ToRat()
+func c_ir_(fn func(float64, Value) complex128) func(Value, Value) complex128 {
+	return func(l Value, r Value) complex128 {
+		if l.T == FLOAT {
+			lr := l.ToFlo()
 			return fn(lr, r)
 		} else if l.T == INTEGER {
-			li := l.ToInt()
-			lr := big.NewRat(0, 1)
-			lr.SetInt(li)
+			lr := l.ToFlo()
 			return fn(lr, r)
 		} else {
 			halt.As(100, "cannot convert")
@@ -236,15 +217,13 @@ func c_ir_(fn func(*big.Rat, Value) *Cmp) func(Value, Value) *Cmp {
 	}
 }
 
-func c_ir_ir_(fn func(*big.Rat, *big.Rat) *Cmp) func(*big.Rat, Value) *Cmp {
-	return func(lr *big.Rat, r Value) *Cmp {
-		if r.T == RATIONAL {
-			rr := r.ToRat()
+func c_ir_ir_(fn func(float64, float64) complex128) func(float64, Value) complex128 {
+	return func(lr float64, r Value) complex128 {
+		if r.T == FLOAT {
+			rr := r.ToFlo()
 			return fn(lr, rr)
 		} else if r.T == INTEGER {
-			ri := r.ToInt()
-			rr := big.NewRat(0, 1)
-			rr.SetInt(ri)
+			rr := r.ToFlo()
 			return fn(lr, rr)
 		} else {
 			halt.As(100, "cannot convert")
@@ -253,15 +232,13 @@ func c_ir_ir_(fn func(*big.Rat, *big.Rat) *Cmp) func(*big.Rat, Value) *Cmp {
 	}
 }
 
-func c_c_ir_(fn func(*Cmp, *big.Rat) *Cmp) func(*Cmp, Value) *Cmp {
-	return func(lc *Cmp, r Value) *Cmp {
-		if r.T == RATIONAL {
-			rr := r.ToRat()
+func c_c_ir_(fn func(complex128, float64) complex128) func(complex128, Value) complex128 {
+	return func(lc complex128, r Value) complex128 {
+		if r.T == FLOAT {
+			rr := r.ToFlo()
 			return fn(lc, rr)
 		} else if r.T == INTEGER {
-			ri := r.ToInt()
-			rr := big.NewRat(0, 1)
-			rr.SetInt(ri)
+			rr := r.ToFlo()
 			return fn(lc, rr)
 		} else {
 			halt.As(100, "cannot convert")
@@ -270,8 +247,8 @@ func c_c_ir_(fn func(*Cmp, *big.Rat) *Cmp) func(*Cmp, Value) *Cmp {
 	}
 }
 
-func c_ir_c_(fn func(*big.Rat, *Cmp) *Cmp) func(*big.Rat, Value) *Cmp {
-	return func(lr *big.Rat, r Value) *Cmp {
+func c_ir_c_(fn func(float64, complex128) complex128) func(float64, Value) complex128 {
+	return func(lr float64, r Value) complex128 {
 		rc := r.ToCmp()
 		return fn(lr, rc)
 	}
