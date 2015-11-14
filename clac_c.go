@@ -30,30 +30,14 @@ func init_COMPLEX() {
 	}))))
 
 	put(POW, COMPLEX, COMPLEX, c_(c_c_(c_c_c_(func(lc complex128, rc complex128) complex128 {
-		panic("wrong")
-	}))))
-
-	put(LSS, COMPLEX, COMPLEX, b_(b_c_(b_c_c_(func(lc complex128, rc complex128) bool {
-		panic("wrong")
-	}))))
-
-	put(LEQ, COMPLEX, COMPLEX, b_(b_c_(b_c_c_(func(lc complex128, rc complex128) bool {
-		panic("wrong")
-	}))))
-
-	put(GEQ, COMPLEX, COMPLEX, b_(b_c_(b_c_c_(func(lc complex128, rc complex128) bool {
-		panic("wrong")
-	}))))
-
-	put(GTR, COMPLEX, COMPLEX, b_(b_c_(b_c_c_(func(lc complex128, rc complex128) bool {
-		panic("wrong")
+		return cmplx.Pow(lc, rc)
 	}))))
 
 	put(EQ, COMPLEX, COMPLEX, b_(b_c_(b_c_c_(func(rc complex128, lc complex128) bool {
-		panic("wrong")
+		return rc == lc
 	}))))
 
 	put(NEQ, COMPLEX, COMPLEX, b_(b_c_(b_c_c_(func(lc complex128, rc complex128) bool {
-		panic("wrong")
+		return lc != rc
 	}))))
 }

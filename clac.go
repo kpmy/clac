@@ -6,6 +6,7 @@ import (
 	"github.com/kpmy/ypk/halt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 type Op int
@@ -237,6 +238,17 @@ func init_ERR() {
 
 	err(CON, INTEGER, NoType)
 	err(CON, FLOAT, NoType)
+
+	for op := LSS; op <= GTR; op++ {
+		for t := NoType + 1; t < lastType; t++ {
+			if t != BOOLEAN && op != EQ && op != NEQ {
+				err(op, t, COMPLEX)
+				if t != COMPLEX {
+					err(op, COMPLEX, t)
+				}
+			}
+		}
+	}
 }
 
 func init() {
@@ -276,7 +288,7 @@ func init() {
 func wrap(f dfn, left, right Value) (ret Value) {
 	defer func() {
 		if x := recover(); x != nil {
-			if s, ok := x.(string); ok && s == "division by zero" {
+			if strings.Contains(fmt.Sprint(x), "divide by zero") {
 				//ok
 			} else {
 				panic(x)

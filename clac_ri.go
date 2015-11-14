@@ -1,5 +1,9 @@
 package clac
 
+import (
+	"math"
+)
+
 func init_MIXED_RI() {
 	put(SUM, FLOAT, INTEGER, r_(r_ir_(r_ir_ir_(func(lr float64, rr float64) float64 {
 		return lr + rr
@@ -18,7 +22,7 @@ func init_MIXED_RI() {
 	}))))
 
 	put(POW, FLOAT, INTEGER, r_(r_ir_(r_ir_ir_(func(lr float64, rr float64) float64 {
-		panic("wrong")
+		return math.Pow(lr, rr)
 	}))))
 
 	put(LSS, FLOAT, INTEGER, b_(b_ir_(b_ir_ir_(func(lr float64, rr float64) bool {

@@ -1,5 +1,9 @@
 package clac
 
+import (
+	"math"
+)
+
 func init_FLOAT() {
 	put(NEG, FLOAT, NoType, r_(r_r_(func(lr float64, r Value) float64 {
 		return -lr
@@ -22,7 +26,7 @@ func init_FLOAT() {
 	}))))
 
 	put(POW, FLOAT, FLOAT, r_(r_r_(r_r_r_(func(lr float64, rr float64) float64 {
-		panic("wrong")
+		return math.Pow(lr, rr)
 	}))))
 
 	put(LSS, FLOAT, FLOAT, b_(b_ir_(b_ir_ir_(func(lr float64, rr float64) bool {
