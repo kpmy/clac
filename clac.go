@@ -31,7 +31,7 @@ func (v Value) String() string {
 	case ErrType:
 		return "error"
 	default:
-		return fmt.Sprint("unknown type ", v.T)
+		return fmt.Sprint("(", v.T, ")", v.V)
 	}
 }
 
@@ -165,6 +165,22 @@ func put(op Op, l Type, r Type, fn dfn) {
 	} else {
 		halt.As(100, "op already exists ", key)
 	}
+}
+
+func Int(x int64) Value {
+	return This(INTEGER, x)
+}
+
+func Flo(x float64) Value {
+	return This(FLOAT, x)
+}
+
+func Cpx(x complex128) Value {
+	return This(COMPLEX, x)
+}
+
+func Grow(op Op, l Type, r Type, fn dfn) {
+	put(op, l, r, fn)
 }
 
 func init_ERR() {

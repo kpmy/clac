@@ -15,18 +15,6 @@ func TestClac(t *testing.T) {
 	t.Log(Do(NEG, r))
 }
 
-func Int(x int64) Value {
-	return This(INTEGER, x)
-}
-
-func Flo(x float64) Value {
-	return This(FLOAT, x)
-}
-
-func Cpx(x complex128) Value {
-	return This(COMPLEX, x)
-}
-
 var rnd *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func Rnd(t Type) (ret Value) {
